@@ -50,10 +50,10 @@ public final class Disaster extends JavaPlugin implements Listener {
                 thunder(player);
                 // メソッド1の呼び出し
                 break;
-            case 2:
-                MAKIMA(player);
-                // メソッド2の呼び出し
-                break;
+           case 2:
+               onExplosionPrime(player) ;
+               // メソッド2の呼び出し
+               break;
             case 3:
                 MAGMA(player);
                 // メソッド3の呼び出し
@@ -83,16 +83,8 @@ public final class Disaster extends JavaPlugin implements Listener {
                 // メソッド9の呼び出し
                 break;
             case 10:
-                NIGHT();
-                // メソッド10の呼び出し
-                break;
-            case 11:
                 JUMP(player);
-                // メソッド11の呼び出し
-                break;
-            case 12:
-                onExplosionPrime(player) ;
-                // メソッド12の呼び出し
+                // メソッド10の呼び出し
                 break;
             // 以下10まで続ける。
         }
