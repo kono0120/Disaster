@@ -2,14 +2,13 @@ package com.github.kono0120.disaster;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,63 +40,62 @@ public final class Disaster extends JavaPlugin implements Listener {
         Player player = deathEvent.getEntity();
 
         //災害を起こす
-        onExplosionPrime(player) ;
 
-//        Random rand = new Random();
-//        // 1~10
-//        int num = rand.nextInt(10) + 1;
-//
-//       switch (num) {
-//            case 1:
-//                thunder(player);
-//                // メソッド1の呼び出し
-//                break;
-//            case 2:
-//                MAKIMA(player);
-//                // メソッド2の呼び出し
-//                break;
-//            case 3:
-//                MAGMA(player);
-//                // メソッド3の呼び出し
-//                break;
-//            case 4:
-//                WATER(player);
-//                // メソッド4の呼び出し
-//                break;
-//            case 5:
-//                TNT(player);
-//                // メソッド5の呼び出し
-//                break;
-//            case 6:
-//                explosion(player);
-//                // メソッド6の呼び出し
-//                break;
-//            case 7:
-//                TENSE();
-//                // メソッド7の呼び出し
-//                break;
-//            case 8:
-//                RAIN();
-//                // メソッド8の呼び出し
-//                break;
-//            case 9:
-//                NIGHT();
-//                // メソッド9の呼び出し
-//                break;
-//            case 10:
-//                NIGHT();
-//                // メソッド10の呼び出し
-//                break;
-//            case 11:
-//                JUMP(player);
-//                // メソッド11の呼び出し
-//                break;
-//            case 12:
-//                onExplosionPrime(player) ;
-//                // メソッド12の呼び出し
-//                break;
-//            // 以下10まで続ける。
-//        }
+        Random rand = new Random();
+        // 1~10
+        int num = rand.nextInt(10) + 1;
+
+       switch (num) {
+            case 1:
+                thunder(player);
+                // メソッド1の呼び出し
+                break;
+            case 2:
+                MAKIMA(player);
+                // メソッド2の呼び出し
+                break;
+            case 3:
+                MAGMA(player);
+                // メソッド3の呼び出し
+                break;
+            case 4:
+                WATER(player);
+                // メソッド4の呼び出し
+                break;
+            case 5:
+                TNT(player);
+                // メソッド5の呼び出し
+                break;
+            case 6:
+                explosion(player);
+                // メソッド6の呼び出し
+                break;
+            case 7:
+                TENSE();
+                // メソッド7の呼び出し
+                break;
+            case 8:
+                RAIN();
+                // メソッド8の呼び出し
+                break;
+            case 9:
+                NIGHT();
+                // メソッド9の呼び出し
+                break;
+            case 10:
+                NIGHT();
+                // メソッド10の呼び出し
+                break;
+            case 11:
+                JUMP(player);
+                // メソッド11の呼び出し
+                break;
+            case 12:
+                onExplosionPrime(player) ;
+                // メソッド12の呼び出し
+                break;
+            // 以下10まで続ける。
+        }
 
 
     }
@@ -202,20 +200,88 @@ public final class Disaster extends JavaPlugin implements Listener {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         Set<Entity> involvedEntities = Collections.synchronizedSet(new HashSet<>());
         new BukkitRunnable() {
-
+            @Override
             public void run() {
                 // ※ブラックホールのサイズ　好きな数字を入れる
-                int radius = 10;
+                int radius = 5;
                 Set<Block> blockSet = new HashSet<>();
 
                 for (int i = 0; i < radius; i++) {
                     getBlockSphereAround(center, i).forEach(block -> {
-
                         blockSet.add(block);
                     });
                 }
+
+                blockSet.forEach(x -> {
+
+                    if (x.isEmpty()) {
+                        return;
+                    }
+
+                    if (random.nextDouble() <= 0.05) {
+                        FallingBlock fallingBlock = world.spawnFallingBlock(x.getLocation(),
+                                x.getBlockData());
+                        fallingBlock.setGravity(false);
+                        fallingBlock.setInvulnerable(true);
+                        involvedEntities.add(fallingBlock);
+                    }
+                    x.setType(Material.AIR);
+
+                });
+                Bukkit.selectEntities(Bukkit.getConsoleSender(), "@e").stream()
+                        .filter(x -> x.getLocation().getWorld().equals(center.getWorld()))
+                        .filter(x -> x.getLocation().distance(center) <= radius)
+                        .filter(x -> {
+                            if (x instanceof Player) {
+                                Player p = ((Player) x);
+                                return p.getGameMode() == GameMode.SURVIVAL
+                                        || p.getGameMode() == GameMode.ADVENTURE;
+                            }
+                            return true;
+                        })
+                        .forEach(involvedEntities::add);
             }
-        };
+        }.runTask(this);
+
+        new BukkitRunnable() {
+            private int tick = 0;
+
+            @Override
+            public void run() {
+                world.playSound(center, Sound.ENTITY_WITHER_SPAWN, 1, 1);
+                involvedEntities.forEach(x -> {
+                    Vector sub;
+                    try {
+                        sub = center.toVector().subtract(x.getLocation().toVector());
+                        sub.multiply(0.35 / sub.length());
+                    } catch (IllegalArgumentException e) {
+                        return;
+                    }
+
+                    x.setVelocity(sub);
+
+                    if (x.getLocation().toVector().distance(center.toVector()) < 1) {
+                        if (x instanceof FallingBlock) {
+                            x.remove();
+                        }
+                        if (x instanceof LivingEntity) {
+                            ((LivingEntity) x).damage(1000);
+                        }
+                    }
+                    center.getWorld().spawnParticle(Particle.REDSTONE, x.getLocation(), 3,
+                            new Particle.DustOptions(Color.BLACK, 5));
+
+                });
+
+                tick++;
+                if (tick >= totalTick) {
+                    involvedEntities.stream()
+                            .filter(x -> x instanceof FallingBlock)
+                            .forEach(Entity::remove);
+                    cancel();
+                }
+            }
+        }.runTaskTimer(this, 0, 1);
     }
 
     public static Set<Block> getBlockSphereAround(Location location, int radius) {
