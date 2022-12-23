@@ -1,0 +1,4 @@
+name: Disaster
+version: '${project.version}'
+main: com.github.kono0120.disaster.Disaster
+api-version: 1.16
