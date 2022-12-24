@@ -10,6 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,12 +22,16 @@ public final class Disaster extends JavaPlugin implements Listener {
     public static Disaster getPlugin() {
         return plugin;
     }
+    public File schematicDirectory;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        plugin = this;
         worldList.forEach(world -> world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false));
         this.getServer().getPluginManager().registerEvents(this, this);
+        schematicDirectory = new File(getDataFolder(),"schematics");
+        schematicDirectory.mkdirs();
     }
 
     @Override
@@ -39,55 +45,85 @@ public final class Disaster extends JavaPlugin implements Listener {
         //デスしたプレイヤーの取得
         Player player = deathEvent.getEntity();
 
-        //災害を起こす
+        Random random = new Random();
+        int num = random.nextInt(314);
 
-        Random rand = new Random();
-        // 1~10
-        int num = rand.nextInt(10) + 1;
+        if (num == 0) {
+            nyandolqr(player);
+        } else if (1 <= num && num <= 31) {
+            thunder(player);
+        } else if (32 <= num && num <= 62) {
+            onExplosionPrime(player);
+        } else if (63 <= num && num <= 93) {
+            WATER(player);
+        } else if (94 <= num && num <= 124) {
+            TNT(player);
+        } else if (125 <= num && num <= 155) {
+            TENSE();
+        } else if (156 <= num && num <= 186) {
+            explosion(player);
+        } else if (187 <= num && num <= 217 ){
+            RAIN();
+        } else if (218 <= num && num <= 248 ){
+            NIGHT();
+        } else if (249 <= num && num <= 280 ){
+            JUMP(player);
+        } else if (281 <= num && num <= 313 ){
+           MAGMA(player);
+        } else {        // num == 314)
 
-       switch (num) {
-            case 1:
-                thunder(player);
-                // メソッド1の呼び出し
-                break;
-           case 2:
-               onExplosionPrime(player) ;
-               // メソッド2の呼び出し
-               break;
-            case 3:
-                MAGMA(player);
-                // メソッド3の呼び出し
-                break;
-            case 4:
-                WATER(player);
-                // メソッド4の呼び出し
-                break;
-            case 5:
-                TNT(player);
-                // メソッド5の呼び出し
-                break;
-            case 6:
-                explosion(player);
-                // メソッド6の呼び出し
-                break;
-            case 7:
-                TENSE();
-                // メソッド7の呼び出し
-                break;
-            case 8:
-                RAIN();
-                // メソッド8の呼び出し
-                break;
-            case 9:
-                NIGHT();
-                // メソッド9の呼び出し
-                break;
-            case 10:
-                JUMP(player);
-                // メソッド10の呼び出し
-                break;
-            // 以下10まで続ける。
         }
+
+        //災害を起こす
+        //nyandolqr(player);
+
+//        Random rand = new Random();
+//        // 1~10
+//        int num = rand.nextInt(10) + 1;
+//
+//       switch (num) {
+//            case 1:
+//                thunder(player);
+//                // メソッド1の呼び出し
+//                break;
+//           case 2:
+//               onExplosionPrime(player) ;
+//               // メソッド2の呼び出し
+//               break;
+//            case 3:
+//                MAGMA(player);
+//                // メソッド3の呼び出し
+//                break;
+//            case 4:
+//                WATER(player);
+//                // メソッド4の呼び出し
+//                break;
+//            case 5:
+//                TNT(player);
+//                // メソッド5の呼び出し
+//                break;
+//            case 6:
+//                explosion(player);
+//                // メソッド6の呼び出し
+//                break;
+//            case 7:
+//                TENSE();
+//                // メソッド7の呼び出し
+//                break;
+//            case 8:
+//                RAIN();
+//                // メソッド8の呼び出し
+//                break;
+//            case 9:
+//                NIGHT();
+//                // メソッド9の呼び出し
+//                break;
+//            case 10:
+//                JUMP(player);
+//                // メソッド10の呼び出し
+//                break;
+//            // 以下10まで続ける。
+//        }
 
 
     }
@@ -98,9 +134,14 @@ public final class Disaster extends JavaPlugin implements Listener {
 
     }
 
-    void MAKIMA(Player player) {
-        player.sendMessage("【悲報】最終決戦後、デンジはマキマを普通に殺すのではなく、彼女の肉を調理して食べるという選択をとった");
-    }
+   void nyandolqr (Player player){
+       try {
+           WEUtil.createPlaceOperation(player.getLocation(),"qr");
+       } catch (IOException e) {
+           throw new RuntimeException(e);
+       }
+
+   }
 
     void MAGMA(Player player) {
         Random rand = new Random();
