@@ -28,7 +28,6 @@ public final class Disaster extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         plugin = this;
-        worldList.forEach(world -> world.setGameRule(GameRule.SHOW_DEATH_MESSAGES, false));
         this.getServer().getPluginManager().registerEvents(this, this);
         schematicDirectory = new File(getDataFolder(),"schematics");
         schematicDirectory.mkdirs();
@@ -45,37 +44,36 @@ public final class Disaster extends JavaPlugin implements Listener {
         //デスしたプレイヤーの取得
         Player player = deathEvent.getEntity();
 
-        Random random = new Random();
-        int num = random.nextInt(314);
+        TNT(player);
 
-        if (num == 0) {
-            nyandolqr(player);
-        } else if (1 <= num && num <= 31) {
-            thunder(player);
-        } else if (32 <= num && num <= 62) {
-            onExplosionPrime(player);
-        } else if (63 <= num && num <= 93) {
-            WATER(player);
-        } else if (94 <= num && num <= 124) {
-            TNT(player);
-        } else if (125 <= num && num <= 155) {
-            TENSE();
-        } else if (156 <= num && num <= 186) {
-            explosion(player);
-        } else if (187 <= num && num <= 217 ){
-            RAIN();
-        } else if (218 <= num && num <= 248 ){
-            NIGHT();
-        } else if (249 <= num && num <= 280 ){
-            JUMP(player);
-        } else if (281 <= num && num <= 313 ){
-           MAGMA(player);
-        } else {        // num == 314)
-
-        }
-
-        //災害を起こす
-        //nyandolqr(player);
+//        Random random = new Random();
+//        int num = random.nextInt(314);
+//
+//        if (num == 0) {
+//            nyandolqr(player);
+//        } else if (1 <= num && num <= 31) {
+//            thunder(player);
+//        } else if (32 <= num && num <= 62) {
+//            onExplosionPrime(player);
+//        } else if (63 <= num && num <= 93) {
+//            WATER(player);
+//        } else if (94 <= num && num <= 124) {
+//            TNT(player);
+//        } else if (125 <= num && num <= 155) {
+//            TENSE();
+//        } else if (156 <= num && num <= 186) {
+//            explosion(player);
+//        } else if (187 <= num && num <= 217 ){
+//            RAIN();
+//        } else if (218 <= num && num <= 248 ){
+//            NIGHT();
+//        } else if (249 <= num && num <= 280 ){
+//            JUMP(player);
+//        } else if (281 <= num && num <= 313 ){
+//           MAGMA(player);
+//        } else {        // num == 314)
+//
+//        }
 
 //        Random rand = new Random();
 //        // 1~10
@@ -223,7 +221,7 @@ public final class Disaster extends JavaPlugin implements Listener {
     }
 
     void JUMP(Player player) {
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tp @r[limit=5] 0 200 0");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tp @r[limit=3] 0 200 0");
     }
 
     private void onExplosionPrime(Player player) {
